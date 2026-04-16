@@ -1,4 +1,8 @@
 # Nemesis
+Nemesis is the public-facing investigative interface as the result of Operation Diponegoro, initiated by Abil Sudarman School of Artificial Intelligence. We ingest millions of rows of procurement data, surface anomalies, and make the findings legible to citizens, journalists, and policymakers.
+
+assai.id/nemesis
+
 
 > End the vampire ball.
 
