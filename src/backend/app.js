@@ -11,14 +11,18 @@ import {
   getProvincePackages,
 } from './services/dashboard.service.js';
 
-function resolveCorsOrigin() {
-  if (CORS_ORIGIN === '*') {
-    return '*';
-  }
+// ── NEW ──────────────────────────────────────────────────────────────────────
+import {
+  getTopRiskyPackages,
+  getOwnerAnomalySummary,
+  getSeverityDistribution,
+  getMethodBreakdown,
+} from './repositories/anomaly-repository.js';
+// ─────────────────────────────────────────────────────────────────────────────
 
-  return CORS_ORIGIN.split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
+function resolveCorsOrigin() {
+  if (CORS_ORIGIN === '*') return '*';
+  return CORS_ORIGIN.split(',').map((item) => item.trim()).filter(Boolean);
 }
 
 export async function createApp() {
@@ -26,7 +30,6 @@ export async function createApp() {
   const db = openDatabase();
   const app = express();
 
-  // Security Middlewares
   app.use(helmet({
     contentSecurityPolicy: {
       useDefaults: true,
@@ -43,64 +46,72 @@ export async function createApp() {
       },
     },
   }));
-  app.use(
-    cors({
-      origin: resolveCorsOrigin(),
-    })
-  );
+  app.use(cors({ origin: resolveCorsOrigin() }));
   app.use(express.json({ limit: '1mb' }));
-  app.use(hpp()); // HTTP Parameter Pollution prevention
+  app.use(hpp());
 
-  // Rate Limiting
   const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     standardHeaders: true,
     legacyHeaders: false,
   });
   app.use('/api', limiter);
 
-  // API Routes
-  app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok' });
-  });
+  // ── Existing routes ───────────────────────────────────────────────────────
 
-  app.get('/api/bootstrap', (_req, res) => {
-    res.json(getBootstrapPayload(db));
-  });
+  app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+
+  app.get('/api/bootstrap', (_req, res) => res.json(getBootstrapPayload(db)));
 
   app.get('/api/regions/:regionKey/packages', (req, res) => {
     const payload = getRegionPackages(db, req.params.regionKey, req.query);
-    if (!payload) {
-      return res.status(404).json({ error: 'Region not found' });
-    }
+    if (!payload) return res.status(404).json({ error: 'Region not found' });
     res.json(payload);
   });
 
   app.get('/api/provinces/:provinceKey/packages', (req, res) => {
     const payload = getProvincePackages(db, req.params.provinceKey, req.query);
-    if (!payload) {
-      return res.status(404).json({ error: 'Province not found' });
-    }
+    if (!payload) return res.status(404).json({ error: 'Province not found' });
     res.json(payload);
   });
 
   app.get('/api/owners/packages', (req, res) => {
     const ownerType = String(req.query.ownerType || '').trim();
     const ownerName = String(req.query.ownerName || '').trim();
-
-    if (!ownerType || !ownerName) {
+    if (!ownerType || !ownerName)
       return res.status(400).json({ error: 'ownerType and ownerName are required' });
-    }
-
     const payload = getOwnerPackages(db, req.query);
-    if (!payload) {
-      return res.status(404).json({ error: 'Owner not found' });
-    }
+    if (!payload) return res.status(404).json({ error: 'Owner not found' });
     res.json(payload);
   });
 
-  // Error boundary
+  // ── NEW: Anomaly routes ───────────────────────────────────────────────────
+
+  app.get('/api/anomaly/top', (req, res) => {
+    res.json(getTopRiskyPackages(db, req.query));
+  });
+
+  app.get('/api/anomaly/owners/summary', (req, res) => {
+    const ownerType = String(req.query.ownerType || '').trim();
+    const ownerName = String(req.query.ownerName || '').trim();
+    if (!ownerType || !ownerName)
+      return res.status(400).json({ error: 'ownerType and ownerName are required' });
+    const result = getOwnerAnomalySummary(db, ownerType, ownerName, req.query);
+    if (!result) return res.status(404).json({ error: 'Owner not found' });
+    res.json(result);
+  });
+
+  app.get('/api/anomaly/severity', (_req, res) => {
+    res.json(getSeverityDistribution(db));
+  });
+
+  app.get('/api/anomaly/methods', (req, res) => {
+    res.json(getMethodBreakdown(db, req.query));
+  });
+
+  // ── Error handler ─────────────────────────────────────────────────────────
+
   app.use((err, _req, res, _next) => {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
