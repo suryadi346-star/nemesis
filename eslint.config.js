@@ -17,14 +17,35 @@ export default [
     },
   },
 
-  // Frontend — browser files
+  // Frontend JS — browser files
   {
-    files: ["src/frontend/**/*.js", "src/frontend/**/*.jsx"],
+    files: ["src/frontend/**/*.js"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
       globals: {
         ...globals.browser,
+      },
+    },
+    rules: {
+      "no-unused-vars": "warn",
+      "no-undef": "error",
+    },
+  },
+
+  // Frontend JSX — Preact/React files
+  {
+    files: ["src/frontend/**/*.jsx"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        ...globals.browser,
+      },
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
       },
     },
     rules: {
