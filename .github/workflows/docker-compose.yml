@@ -1,0 +1,19 @@
+services:
+  nemesis:
+    build: .
+    container_name: nemesis
+    ports:
+      - "3000:3000"
+    environment:
+      # Konfigurasi default (bisa di-override via .env atau env_file)
+      - NODE_ENV=production
+      - PORT=3000
+      - CORS_ORIGIN="*"
+      - SQLITE_PATH=data/dashboard.sqlite
+      - AUDIT_DATASET_DIR=dataset
+      - GEO_ROOT_PATH=seed/geo
+    volumes:
+      - ./data:/app/data       # Persist database SQLite
+      - ./dataset:/app/dataset # Dataset dinamis untuk kompilasi DB
+      - ./logs:/app/logs       # Log aplikasi (rotating)
+    restart: unless-stopped
