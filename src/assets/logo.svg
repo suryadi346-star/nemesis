@@ -1,0 +1,34 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#grad)" opacity="0.15"/>
+  
+  <!-- Shield outline -->
+  <path d="M256 80 L400 140 L400 280 Q400 380 256 440 Q112 380 112 280 L112 140 Z" 
+        fill="none" stroke="url(#grad)" stroke-width="12" filter="url(#glow)"/>
+  
+  <!-- Inner eye/monitor symbol -->
+  <circle cx="256" cy="240" r="70" fill="none" stroke="#06b6d4" stroke-width="6"/>
+  <circle cx="256" cy="240" r="25" fill="#06b6d4" opacity="0.8"/>
+  
+  <!-- Decorative lines (data flow) -->
+  <line x1="180" y1="180" x2="220" y2="210" stroke="#06b6d4" stroke-width="3" opacity="0.7"/>
+  <line x1="332" y1="180" x2="292" y2="210" stroke="#06b6d4" stroke-width="3" opacity="0.7"/>
+  <line x1="256" y1="310" x2="256" y2="360" stroke="#06b6d4" stroke-width="3" opacity="0.7"/>
+  
+  <!-- Bottom accent -->
+  <path d="M200 400 Q256 420 312 400" fill="none" stroke="#06b6d4" stroke-width="4" stroke-linecap="round"/>
+</svg>
