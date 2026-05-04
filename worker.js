@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import { createStream } from 'rotating-file-stream';
@@ -64,6 +65,13 @@ async function startServer() {
   // Cleaner, colorized format for the immediate console
   app.use(morgan('dev'));
 
+  const staticRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 300, // max 300 requests per IP per window
+    standardHeaders: true,
+    legacyHeaders: false
+  });
+
   // Mount the secure API under root (the routers inside already prefix /api)
   app.use('/', apiApp);
 
@@ -83,8 +91,8 @@ async function startServer() {
     if (!fs.existsSync(distPath)) {
       console.warn('[Worker] WARNING: dist directory not found! Run `npm run build` for production.');
     } else {
-      app.use(express.static(distPath));
-      app.get(/(.*)/, (req, res) => {
+      app.use(staticRateLimiter, express.static(distPath));
+      app.get(/(.*)/, staticRateLimiter, (req, res) => {
         res.sendFile(path.join(distPath, 'index.html'));
       });
       console.log('[Worker] Static production files served from /dist');
