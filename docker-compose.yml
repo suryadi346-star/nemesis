@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  nemesis:
+    build: .
+    container_name: nemesis
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - CORS_ORIGIN=/
+      - SQLITE_PATH=/app/data/dashboard.sqlite
+      - AUDIT_DATASET_DIR=/app/dataset
+      - GEO_ROOT_PATH=/app/seed/geo
+    volumes:
+      - ./data:/app/data
+      - ./dataset:/app/dataset
+      - ./logs:/app/logs
+    restart: unless-stopped
