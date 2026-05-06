@@ -21,7 +21,7 @@ if (!Number.isInteger(port) || port <= 0) {
 const DATA_DIR = resolveFromRoot(process.env.DATA_DIR, 'data');
 const DATASET_DIR = resolveFromRoot(process.env.AUDIT_DATASET_DIR, 'dataset');
 const GEO_ROOT_PATH = resolveFromRoot(process.env.GEO_ROOT_PATH, path.join('seed', 'geo'));
-const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '';
 const DB_PATH = resolveFromRoot(process.env.SQLITE_PATH, path.join('data', 'dashboard.sqlite'));
 const GEOJSON_PATH = resolveFromRoot(
   process.env.GEOJSON_PATH,

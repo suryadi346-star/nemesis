@@ -21,8 +21,14 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function resolveCorsOrigin() {
-  if (CORS_ORIGIN === '*') return '*';
-  return CORS_ORIGIN.split(',').map((item) => item.trim()).filter(Boolean);
+  const allowedOrigins = CORS_ORIGIN
+    .split(',')
+    .map((item) => item.trim())
+    .filter((item) => item && item !== '*');
+
+  if (allowedOrigins.length === 0) return false;
+  if (allowedOrigins.length === 1) return allowedOrigins[0];
+  return allowedOrigins;
 }
 
 export async function createApp() {
