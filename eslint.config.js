@@ -1,56 +1,37 @@
-import globals from "globals";
+import globals from 'globals';
+
+const sharedRules = {
+  'no-unused-vars': 'warn',
+  'no-undef': 'error',
+};
+
+const sharedLanguageOptions = {
+  ecmaVersion: 'latest',
+  sourceType: 'module',
+};
 
 export default [
-  // Backend — Node.js files
   {
-    files: ["src/backend/**/*.js", "scripts/**/*.js", "worker.js"],
+    files: ['src/backend/**/*.js', 'scripts/**/*.js', 'worker.js', 'vite.config.js', 'eslint.config.js'],
     languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
+      ...sharedLanguageOptions,
       globals: {
         ...globals.node,
       },
     },
-    rules: {
-      "no-unused-vars": "warn",
-      "no-undef": "error",
-    },
+    rules: sharedRules,
   },
-
-  // Frontend JS — browser files
   {
-    files: ["src/frontend/**/*.js"],
+    files: ['src/frontend/**/*.{js,jsx}'],
     languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
-      globals: {
-        ...globals.browser,
-      },
-    },
-    rules: {
-      "no-unused-vars": "warn",
-      "no-undef": "error",
-    },
-  },
-
-  // Frontend JSX — Preact/React files
-  {
-    files: ["src/frontend/**/*.jsx"],
-    languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
-      globals: {
-        ...globals.browser,
-      },
+      ...sharedLanguageOptions,
       parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
+        ecmaFeatures: { jsx: true },
+      },
+      globals: {
+        ...globals.browser,
       },
     },
-    rules: {
-      "no-unused-vars": "warn",
-      "no-undef": "error",
-    },
+    rules: sharedRules,
   },
 ];
